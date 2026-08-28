@@ -1,0 +1,37 @@
+<html>
+<head>
+    <title>Processing PDF</title>
+    <script>
+        function checkStatus() {
+            fetch('/check_status/{{ pdf_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'complete') {
+                        window.location.href = '/{{ pdf_id }}';
+                    } else if (data.status.startsWith('error')) {
+                        document.getElementById('status').innerHTML = 'Error: ' + data.status;
+                    } else {
+                        setTimeout(checkStatus, 2000);
+                    }
+                });
+        }
+        window.onload = function() {
+            setTimeout(checkStatus, 2000);
+        };
+    </script>
+</head>
+<body>
+    <h1>Processing your PDF...</h1>
+    <p>This takes about 2.5 minutes.</p>
+    <div id="status">
+        <span>Processing...</span>
+        <div class="spinner" style="display: inline-block; width: 20px; height: 20px; border: 2px solid #ccc; border-top: 2px solid #333; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

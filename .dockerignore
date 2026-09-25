@@ -1,0 +1,9 @@
+# Allowlist: only what the image needs goes into the build context.
+*
+!dataview/
+!requirements.txt
+!gunicorn.conf.py
+!healthcheck.py
+!manage.py
+**/__pycache__
+**/*.py[co]

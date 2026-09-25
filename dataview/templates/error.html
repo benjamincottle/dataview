@@ -1,1 +1,9 @@
-sorry, I ran into a problem, all I know is {{ message }}
+{% extends "base.html" %}
+{% block title %}Something went wrong · Dataview{% endblock %}
+{% block content %}
+<section class="message">
+    <h1>Sorry, something went wrong</h1>
+    <p>{{ message }}</p>
+    <p><a href="{{ url_for('main.index') }}">Back to the home page</a></p>
+</section>
+{% endblock %}

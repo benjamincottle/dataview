@@ -1,0 +1,17 @@
+[project]
+name = "dataview"
+version = "1.0.0"
+description = "Searchable web views of public datasets that are only published as PDFs."
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
+addopts = "-p no:cacheprovider"

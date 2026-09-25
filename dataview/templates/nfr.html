@@ -1,230 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+{% macro segments(parts, row_id) -%}
+    {%- for kind, value in parts -%}
+        {%- if kind == "text" -%}{{ value }}
+        {%- elif kind == "sup" -%}<sup>{{ value }}</sup>
+        {%- else -%}<sup class="fn"><a href="#{{ row_id }}-note-{{ value }}" aria-label="Note {{ value }}">{{ value }}</a></sup>
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro %}
 
-        header {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 5px 0;
-        }
+{% block title %}Novel foods: record of views · Dataview{% endblock %}
+{% block description %}Search FSANZ's record of views on whether foods and food ingredients are novel under Standard 1.5.1.{% endblock %}
 
-        .container {
-            margin: 20px;
-        }
+{% block content %}
+<div class="page-head">
+    <h1>Novel foods: record of views</h1>
+    <p class="meta">
+        Source: <a href="{{ data.pdf_url }}" rel="noopener noreferrer">{{ data.title }}</a>
+        (FSANZ, PDF) · Processed {{ data.updated_at | datetime }} · Checked for updates {{ data.checked_at | datetime }}
+    </p>
+</div>
 
-        .search-inputs {
-            margin-bottom: 20px;
-        }
+{% if notice %}
+<p class="banner banner-info" role="status">
+    FSANZ has published a new version. It is being processed; until it's ready you are seeing the previous one.
+</p>
+{% endif %}
+{% if warning %}
+<p class="banner banner-warn" role="status">{{ warning }} Showing the most recent data we have.</p>
+{% endif %}
 
-        .search-inputs input {
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box; /* Include padding and border in the width */
-        }
+<details class="about">
+    <summary>About this data</summary>
+    <p>
+        This is a searchable copy of the record of views formed and actions taken in relation to
+        <a href="https://www.legislation.gov.au/Series/F2015L00403" rel="noopener noreferrer">Standard 1.5.1 – Novel Foods</a>
+        of the Food Standards Code. It lists foods and food ingredients with views regarding their
+        status as non-traditional or novel foods.
+    </p>
+    <p>
+        Before March 2008 these views were reached by the now superseded Novel Food Reference Group
+        (NFRG), either alone or in consultation with Senior Food Officers of the Australian, state,
+        territory and New Zealand governments and the then Australian Quarantine and Inspection
+        Service. Since March 2008 the views recorded are the recommendations of the Advisory
+        Committee on Novel Foods (ACNF).
+    </p>
+    <p>
+        Enforcement of the Code is the responsibility of the Australian state and territory
+        governments, the Department of Agriculture at the border, and the New Zealand Government.
+        The interpretation and application of Standard 1.5.1, including decisions about the novelty
+        of a food or food ingredient, is ultimately the responsibility of those jurisdictions.
+    </p>
+    <p>
+        The table is extracted automatically from the
+        <a href="{{ data.pdf_url }}" rel="noopener noreferrer">official PDF</a>, which remains
+        the authoritative version. FSANZ is checked for a new version at most every
+        {{ (config.NFR_CHECK_INTERVAL // 60) }} minutes.
+    </p>
+</details>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        td {
-            background-color: #fff;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        table th:nth-child(1),
-        table td:nth-child(1) {
-            width: 20%;
-        }
-
-        table th:nth-child(2),
-        table td:nth-child(2) {
-            width: 20%;
-        }
-
-        table th:nth-child(3),
-        table td:nth-child(3) {
-            width: 60%;
-        }
-
-        .collapsible-container {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .collapsible-button {
-            background-color: #555;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .collapsible-button:hover {
-            background-color: #888;
-        }
-
-        .collapsible-content {
-            display: none; /* Initially hidden */
-            margin: 10px 20px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: left;
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <h1>{{ title }}<button id="collapsibleButton" class="collapsible-button" style="margin-left:50px;">ⓘ</button></h1>
-    </header>
-
-    <!-- Collapsible Section -->
-    <div class="collapsible-container">
-        <div id="collapsibleContent" class="collapsible-content">
-<div class="field-item">
-              <p>This document provides a record of views formed and actions taken in relation to <a href="https://www.legislation.gov.au/Series/F2015L00403" target="_blank" data-once="terms-conditions-link">Standard 1.5.1 - Novel Foods of the Code</a>.</p>
-<p>It lists foods and food ingredients with views&nbsp;regarding their status as non-traditional/novel foods. Prior to March 2008, these views were reached by the now superseded Novel Food Reference Group (NFRG) either alone or in consultation with Senior Food Officers of the Australian, state, territory and New Zealand governments, as well as the then Australian Quarantine and Inspection Service.</p>
-<p>Since March 2008, the views recorded are the recommendations of the Advisory Committee on Novel Foods (ANCF) (blue text in the table below). Although the FSANZ NFRG no longer exists, the views formed by this group still represent a considered judgement of the product on the basis of information provided by inquirers as well as some independent research by FSANZ.</p>
-<p>Other foods and food ingredients not included in the table have been considered in response to inquiries. However, views in relation to these items have not yet been formed, pending receipt of further information requested from the inquirer.</p>
-<p>Enforcement of the Code is the responsibility of the Australian state and territory governments, the Department of Agriculture, Water and the Environment at the border,&nbsp;and the New Zealand Government. Accordingly, the interpretation and application of Standard 1.5.1, including decisions about the novelty of a food or food ingredient, is ultimately the responsibility of those jurisdictions.</p>
-<p>The current version of the pdf can be found here: <a href="{{url}}" target="_blank">{{title}}</a></p>
-<p>Refreshing this page will check for updated data.</p>
-          </div>
-        </div>
+<form class="filters" id="filters" role="search" method="get" action="{{ url_for('main.nfr_view') }}">
+    <div class="field field-wide">
+        <label for="q">Search everything</label>
+        <input id="q" name="q" type="search" value="{{ filters.q }}" autocomplete="off"
+               placeholder="e.g. mushroom, probiotic, 2024">
     </div>
-
-    <div class="container">
-        <table id="dataTable">
-            <thead>
-                <tr class="search-inputs">
-                    <th colspan="3"><input type="text" id="globalSearch" placeholder="Search all data" oninput="filterTable()" style="width: 100%;"></th>
-                </tr>
-                <tr class="search-inputs">
-                    <th><input type="text" id="foodSearch" placeholder="Search Food" oninput="filterTable()"></th>
-                    <th><input type="text" id="outcomeSearch" placeholder="Search Outcome" oninput="filterTable()"></th>
-                    <th><input type="text" id="justificationSearch" placeholder="Search Justification" oninput="filterTable()"></th>
-                </tr>
-                <tr>
-                    <th>Food or Food Ingredient</th>
-                    <th>Outcome View</th>
-                    <th>Justification/Comment</th>
-                </tr>
-            </thead>
-            <tbody id="dataBody">
-                <!-- Data rows will be injected here -->
-            </tbody>
-        </table>
+    <div class="field">
+        <label for="food">Food or ingredient</label>
+        <input id="food" name="food" type="search" value="{{ filters.food }}" autocomplete="off">
     </div>
+    <div class="field">
+        <label for="outcome">Outcome</label>
+        <select id="outcome" name="outcome">
+            <option value="">Any outcome</option>
+            {% for value, label in outcome_filters.items() %}
+            <option value="{{ value }}" {% if filters.outcome == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="field">
+        <label for="justification">Justification mentions</label>
+        <input id="justification" name="justification" type="search" value="{{ filters.justification }}" autocomplete="off">
+    </div>
+    <div class="filter-actions">
+        <p id="result-count" class="result-count" aria-live="polite">
+            Showing {{ visible }} of {{ rows | length }} entries
+        </p>
+        <button type="submit" class="button js-hidden">Filter</button>
+        <a class="button button-quiet" id="reset" href="{{ url_for('main.nfr_view') }}">Clear</a>
+    </div>
+</form>
 
-    <script>
-        // Sample JSON data
-        const jsonData = {{ json|safe }};
+<div class="table-wrap">
+    <table class="records" id="records">
+        <thead>
+            <tr>
+                <th scope="col">Food or food ingredient</th>
+                <th scope="col">Outcome view</th>
+                <th scope="col">Justification / comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            {% set row_id = "r" ~ loop.index %}
+            <tr id="{{ row_id }}" data-tones="{{ row.tones }}" {% if row.hidden %}hidden{% endif %}>
+                <th scope="row" data-label="Food or food ingredient">{{ segments(row.food, row_id) }}</th>
+                <td data-label="Outcome view">
+                    {% if row.outcome %}
+                    <ul class="outcomes">
+                        {% for item in row.outcome %}
+                        <li class="tag tag-{{ item.tone }}">{{ item.text }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span class="muted">Cross-reference</span>
+                    {% endif %}
+                </td>
+                <td data-label="Justification / comment">
+                    {{ segments(row.justification, row_id) }}
+                    {% if row.notes %}
+                    <ul class="notes">
+                        {% for note in row.notes %}
+                        <li id="{{ row_id }}-note-{{ note.n }}">
+                            <sup>{{ note.n }}</sup>
+                            {{ note.text or "See footnote in the PDF." }}
+                            <a href="{{ data.pdf_url }}#page={{ note.page }}" rel="noopener noreferrer">PDF p.&nbsp;{{ note.page }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="empty" id="no-results" {% if visible %}hidden{% endif %}>No entries match your search.</p>
+</div>
+{% endblock %}
 
-        // Function to populate the table with the JSON data
-        function populateTable() {
-            const tbody = document.getElementById('dataBody');
-            tbody.innerHTML = ''; // Clear any existing rows
-
-            Object.keys(jsonData['Food or food ingredient']).forEach(key => {
-                const food = jsonData['Food or food ingredient'][key];
-                const outcome = jsonData['Outcome View'][key];
-                const justification = jsonData['Justification/Comment'][key];
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${food}</td>
-                <td>${outcome}</td>
-                <td>${justification}</td>
-            `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Function to filter the table based on search inputs (both global and column-specific)
-        function filterTable() {
-            const globalSearch = document.getElementById('globalSearch').value.toLowerCase();
-            const foodSearch = document.getElementById('foodSearch').value.toLowerCase();
-            const outcomeSearch = document.getElementById('outcomeSearch').value.toLowerCase();
-            const justificationSearch = document.getElementById('justificationSearch').value.toLowerCase();
-
-            const rows = document.querySelectorAll('#dataTable tbody tr');
-
-            rows.forEach(row => {
-                const cells = row.getElementsByTagName('td');
-                const food = cells[0].textContent.toLowerCase();
-                const outcome = cells[1].textContent.toLowerCase();
-                const justification = cells[2].textContent.toLowerCase();
-
-                // Check if the row matches the global search or any column-specific searches
-                const globalMatch = globalSearch && (food.includes(globalSearch) || outcome.includes(globalSearch) || justification.includes(globalSearch));
-                const foodMatch = food.includes(foodSearch);
-                const outcomeMatch = outcome.includes(outcomeSearch);
-                const justificationMatch = justification.includes(justificationSearch);
-
-                // Display the row if it matches the global search or all column-specific searches
-                if (globalMatch || (!globalSearch && foodMatch && outcomeMatch && justificationMatch)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // JavaScript to toggle the collapsible section
-        const collapsibleButton = document.getElementById('collapsibleButton');
-        const collapsibleContent = document.getElementById('collapsibleContent');
-
-        collapsibleButton.addEventListener('click', () => {
-            if (collapsibleContent.style.display === 'none' || collapsibleContent.style.display === '') {
-                collapsibleContent.style.display = 'block';
-                collapsibleButton.textContent = '▲'; // Change button to an "up" arrow
-            } else {
-                collapsibleContent.style.display = 'none';
-                collapsibleButton.textContent = 'ⓘ'; // Change button back to "three dots"
-            }
-        });
-
-        // Populate the table on page load
-        window.onload = function () {
-            populateTable();
-        };
-    </script>
-</body>
-
-</html>
+{% block scripts %}<script src="{{ asset_url('nfr.js') }}" defer></script>{% endblock %}

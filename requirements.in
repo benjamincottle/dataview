@@ -1,0 +1,9 @@
+# Top-level runtime dependencies. requirements.txt is generated from this file:
+#   uv pip compile requirements.in --universal --python-version 3.14 --generate-hashes -o requirements.txt
+beautifulsoup4
+camelot-py
+flask
+flask-caching
+gunicorn
+pypdfium2
+requests

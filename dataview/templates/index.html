@@ -1,9 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hello, Data!</title>
-</head>
-<body>
-    <h1><a href="./nfr">Novel Food Recs</a></h1>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h1>Dataview</h1>
+<p class="lead">Searchable versions of public datasets that are only published as PDFs.</p>
+
+<ul class="cards">
+    <li class="card">
+        <h2><a href="{{ url_for('main.nfr_view') }}">Novel foods: record of views</a></h2>
+        <p>
+            Food Standards Australia New Zealand's record of whether foods and ingredients are
+            considered traditional or novel under Standard 1.5.1 of the Food Standards Code.
+        </p>
+    </li>
+</ul>
+{% endblock %}

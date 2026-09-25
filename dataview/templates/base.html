@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}Dataview{% endblock %}</title>
+    <meta name="description" content="{% block description %}Searchable versions of public datasets that are only published as PDFs.{% endblock %}">
+    <link rel="icon" href="{{ asset_url('favicon.svg') }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ asset_url('app.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <div class="wrap">
+            <a class="brand" href="{{ url_for('main.index') }}">Dataview</a>
+        </div>
+    </header>
+    <main id="main" class="wrap">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="wrap">
+            Unofficial views of public data. Always check the original source before relying on it.
+        </div>
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -62,6 +62,11 @@ uv pip compile requirements.in --universal --python-version 3.14 --generate-hash
 
 ## CI
 
-`.github/workflows/build.yml` lints and tests every push and pull request, then builds the arm64 image.
-Pushes to `main` publish it to `ghcr.io/<owner>/dataview`. A daily run rebuilds when the
-`python:3.14-slim` base image changes, to pick up OS security fixes.
+- `ci.yml`: ruff, pytest and actionlint on every PR and push to `main`; PRs also build the image (without pushing).
+- `build.yml`: on pushes to `main` that change the image, builds the arm64 image and publishes it to
+  `ghcr.io/<owner>/dataview` as `:latest` and `:<commit sha>`, with provenance and an SBOM. A daily run rebuilds
+  when the `python:3.14-slim` base image changes, to pick up OS security fixes.
+- `audit.yml`: pip-audit of the lockfile on dependency changes and daily.
+
+Actions are pinned to full commit SHAs (with the version in a comment). Dependabot bumps them, and the Python
+lock, in one grouped PR each per week; major Python dependency upgrades stay manual.

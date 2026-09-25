@@ -1,6 +1,28 @@
 version: 2
 updates:
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: monthly
+      interval: "weekly" # Options: daily, weekly, monthly
+    groups:
+      actions:
+        patterns:
+          - "*" # Groups all action updates into one weekly PR to avoid noise
+
+  # requirements.txt is a hashed lock from `uv pip compile requirements.in`,
+  # which the uv ecosystem re-resolves (the pip ecosystem would not).
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      python:
+        patterns:
+          - "*" # One grouped PR per week instead of one per package
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major" # Breaking bumps stay manual

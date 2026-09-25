@@ -14,5 +14,9 @@ worker_tmp_dir = "/dev/shm"
 timeout = 60
 graceful_timeout = 20
 
+# The control socket (gunicornc) isn't used, and it needs a writable $HOME,
+# which a read-only container doesn't have.
+control_socket_disable = True
+
 accesslog = "-"
 loglevel = os.environ.get("LOG_LEVEL", "info")

@@ -38,7 +38,7 @@ Any Flask setting can be set with a `DATAVIEW_` prefixed environment variable.
 | `WEB_CONCURRENCY` | `1` | gunicorn workers. With more than one, use a shared cache (below) |
 | `GUNICORN_THREADS` | `4` | Threads per worker |
 | `DATAVIEW_CACHE_TYPE` | `SimpleCache` | `FileSystemCache` keeps data across restarts and workers |
-| `DATAVIEW_CACHE_DIR` | `/tmp/dataview-cache` | Used by `FileSystemCache`; mount a volume here to persist |
+| `DATAVIEW_CACHE_DIR` | `/home/app/cache` in the image | Used by `FileSystemCache`; mount a volume here to keep data across restarts |
 | `DATAVIEW_NFR_CHECK_INTERVAL` | `900` | Seconds between checks for a new PDF |
 | `DATAVIEW_NFR_RETRY_AFTER` | `300` | Seconds to wait after a failed parse before retrying |
 

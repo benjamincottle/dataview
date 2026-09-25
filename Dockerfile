@@ -20,10 +20,14 @@ FROM ${PYTHON_IMAGE}
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=8000 \
+    DATAVIEW_CACHE_DIR=/home/app/cache
 
-RUN groupadd --system app \
-    && useradd --system --gid app --home-dir /home/app --create-home app
+# Fixed IDs (the ones earlier images got by chance) so volume and tmpfs
+# ownership in compose files stays stable across rebuilds.
+RUN groupadd --system --gid 101 app \
+    && useradd --system --uid 100 --gid app --home-dir /home/app --create-home app \
+    && install -d -o app -g app /home/app/cache
 
 COPY --from=builder /opt/venv /opt/venv
 

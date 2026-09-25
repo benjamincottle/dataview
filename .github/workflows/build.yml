@@ -110,7 +110,7 @@ jobs:
       # Pull requests build the image to prove it still builds, without pushing.
       - name: Build and push
         if: steps.compare.outputs.changed == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/arm64

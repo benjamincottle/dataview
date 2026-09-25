@@ -24,10 +24,13 @@ ENV PATH=/opt/venv/bin:$PATH \
     DATAVIEW_CACHE_DIR=/home/app/cache
 
 # Fixed IDs (the ones earlier images got by chance) so volume and tmpfs
-# ownership in compose files stays stable across rebuilds.
+# ownership in compose files stays stable across rebuilds. /home/app is
+# opened up from useradd's 0700 so the image also runs as any other uid
+# (e.g. `user: "1000:1000"` to own a bind-mounted cache).
 RUN groupadd --system --gid 101 app \
     && useradd --system --uid 100 --gid app --home-dir /home/app --create-home app \
-    && install -d -o app -g app /home/app/cache
+    && install -d -o app -g app /home/app/cache \
+    && chmod 0755 /home/app
 
 COPY --from=builder /opt/venv /opt/venv
 

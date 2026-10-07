@@ -69,4 +69,4 @@ uv pip compile requirements.in --universal --python-version 3.14 --generate-hash
 - `audit.yml`: pip-audit of the lockfile on dependency changes and daily.
 
 Actions are pinned to full commit SHAs (with the version in a comment). Dependabot bumps them, and the Python
-lock, in one grouped PR each per week; major Python dependency upgrades stay manual.
+lock (transitive pins included), in one grouped PR each per week; major Python dependency upgrades stay manual.

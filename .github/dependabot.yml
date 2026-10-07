@@ -16,6 +16,11 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # Every pin in a compiled requirements.txt counts as indirect (only
+    # requirements.in names are direct), and the default only updates direct
+    # dependencies, so without this transitive pins like werkzeug never move.
+    allow:
+      - dependency-type: "all"
     labels:
       - "dependencies"
     groups:
